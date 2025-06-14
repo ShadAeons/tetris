@@ -31,15 +31,24 @@ void screen_clear(Screen *screen) {
 
 
 void screen_draw(Screen *screen, ScreenObject *object) {
+    // Find the amount cut off from left and top
     uint8_t left_diff = object->x < 0 ? abs(object->x) : 0;
     uint8_t top_diff = object->y < 0 ? abs(object->y) : 0;
+
+    // Find the amount cut off from right and bottom
     uint8_t right_diff = MAX((object->x + object->width) - SCREEN_WIDTH, 0);
     uint8_t bottom_diff = MAX((object->y + object->height) - SCREEN_HEIGHT, 0);
 
-    for (int i = top_diff; i < object->height - bottom_diff; i++) {
-        for (int j = left_diff; j < object->width - right_diff; j++) {
-            screen->buffer[(object->y + i) * SCREEN_WIDTH + object->x + j] = object->data[i * object->width + j];
-        }
+    // The remaining size after cutting off from all sides
+    uint8_t remaining_width = object->width - right_diff;
+    uint8_t remaining_height = object->height - bottom_diff;
+
+    for (int i = top_diff * object->width + left_diff; i < remaining_width * remaining_height; i++) {
+        // Convert local vector positioning to screen
+        uint8_t x = i % remaining_width + object->x;
+        uint8_t y = (uint8_t) (i / remaining_width) + object->y;
+
+        screen->buffer[y * SCREEN_WIDTH + x] = object->data[i];
     }
 }
 
