@@ -28,13 +28,9 @@ int game_run(Game *game) {
 
     game->running = true;
     while (game->running) {
-        game_update(game);
+        game_poll_events(game);
 
-        time_t now = time(NULL);
-        if (now - game->last_tick >= game->tick_speed) {
-            game_tick(game);
-            game->last_tick = now;
-        }
+        game_update(game);
     }
 
     game_quit(game);
@@ -54,41 +50,39 @@ void game_quit(Game *game) {
 }
 
 
-void game_update(Game *game) {
+void game_poll_events(Game *game) {
     if (_kbhit()) {
         int key = _getch();
 
         GameEvent event = game_handle_key_press(key);
-        if (event == GAME_QUIT) {
-            game->running = false;
-            return;
-        }
 
-        if (event != GAME_NONE) {
-            if (event == GAME_PIECE_ROTATE_LEFT) {
-                uint8_t rotation = (game->current_piece.rotation + 3) % 4;
-                game_piece_rotate(game, rotation);
-            }
+        switch (event) {
+            case GAME_QUIT:
+                game->running = false;
+                return;
 
-            if (event == GAME_PIECE_ROTATE_RIGHT) {
-                uint8_t rotation = (game->current_piece.rotation + 1) % 4;
-                game_piece_rotate(game, rotation);
-            }
+            case GAME_PIECE_ROTATE_LEFT:
+                game_piece_rotate(game, (game->current_piece.rotation + 3) % 4);
+                break;
 
-            if (event == GAME_PIECE_MOVE_LEFT) {
+            case GAME_PIECE_ROTATE_RIGHT:
+                game_piece_rotate(game, (game->current_piece.rotation + 1) % 4);
+                break;
+
+            case GAME_PIECE_MOVE_LEFT:
                 game_piece_move(game, -1, 0);
-            }
+                break;
 
-            if (event == GAME_PIECE_MOVE_RIGHT) {
+            case GAME_PIECE_MOVE_RIGHT:
                 game_piece_move(game, 1, 0);
-            }
+                break;
 
-            if (event == GAME_PIECE_MOVE_DOWN) {
+            case GAME_PIECE_MOVE_DOWN:
                 game_piece_move(game, 0, 1);
                 game->last_tick = time(NULL);
-            }
+                break;
 
-            if (event == GAME_PIECE_HOLD) {
+            case GAME_PIECE_HOLD:
                 if (!game->piece_holder.used_hold) {
                     PieceType swapped = piece_holder_swap(&game->piece_holder, game->current_piece.type);
                     if (swapped == __PIECE_COUNT) {
@@ -99,10 +93,22 @@ void game_update(Game *game) {
 
                     piece_holder_disable(&game->piece_holder);
                 }
-            }
+                break;
 
-            game_display(game);
+            default:
+                return;
         }
+
+        game_display(game);
+    }
+}
+
+
+void game_update(Game *game) {
+    time_t now = time(NULL);
+    if (now - game->last_tick >= game->tick_speed) {
+        game_tick(game);
+        game->last_tick = now;
     }
 }
 

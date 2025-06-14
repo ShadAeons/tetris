@@ -45,6 +45,8 @@ int game_run(Game *game);
 void game_quit(Game *game);
 
 // Game runtime
+void game_poll_events(Game *game);
+
 void game_update(Game *game);
 void game_tick(Game *game);
 
