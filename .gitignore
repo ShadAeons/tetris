@@ -1,0 +1,6 @@
+# IDEs & Editors
+.vscode
+
+# Build artifacts
+bin/
+obj/
