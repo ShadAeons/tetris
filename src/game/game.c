@@ -163,6 +163,10 @@ void game_spawn_piece(Game *game, PieceType type) {
     game->current_piece.rotation = 0;
     game->current_piece.position[0] = PIECE_SPAWNS[type][0];
     game->current_piece.position[1] = PIECE_SPAWNS[type][1];
+
+    if (!board_is_possible_move(&game->board, &game->current_piece, 0, 0, 0)) {
+        game->running = false;
+    }
 }
 
 
