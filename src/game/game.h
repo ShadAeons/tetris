@@ -34,9 +34,6 @@ typedef struct {
     // Piece holding
     PieceHolder piece_holder;
 
-    // PieceType held_piece;
-    // bool used_hold;
-
     // Game difficulty
     time_t last_tick;
     float tick_speed;

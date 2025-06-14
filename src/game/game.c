@@ -13,8 +13,6 @@ void game_init(Game *game) {
     game->last_tick     = time(NULL);
     game->tick_speed    = 1.0;
     game->running       = false;
-    // game->held_piece    = __PIECE_COUNT;
-    // game->used_hold     = false;
 
     // Add random pieces to the queue
     piece_queue_init(&game->piece_queue);
@@ -224,20 +222,3 @@ void game_piece_rotate(Game *game, uint8_t rotation) {
         }
     }
 }
-
-
-// void game_piece_hold(Game *game) {
-//     if (game->used_hold) return;
-
-//     if (game->held_piece == __PIECE_COUNT) {
-//         game->held_piece = game->current_piece.type;
-//         game_spawn_next_piece(game);
-//     } else {
-//         PieceType next = game->held_piece;
-//         game->held_piece = game->current_piece.type;
-
-//         game_spawn_piece(game, next);
-//     }
-
-//     game->used_hold = true;
-// }
